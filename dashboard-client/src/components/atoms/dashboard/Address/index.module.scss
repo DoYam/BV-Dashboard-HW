@@ -1,0 +1,13 @@
+@import '@/styles/_fonts.scss';
+
+.address_container {
+  width: 120px;
+  display: flex;
+  flex-direction: row;
+  gap: 6px;
+}
+
+.address {
+  color: var(--Black-Black---14);
+  @extend %medium_M;
+}
