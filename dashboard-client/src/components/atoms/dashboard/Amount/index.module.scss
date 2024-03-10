@@ -1,0 +1,18 @@
+@import '@/styles/_fonts.scss';
+
+.amount_container {
+  display: flex;
+  width: 120px;
+  align-items: flex-end;
+  gap: 8px;
+}
+
+.amount_balance {
+  color: var(--Black-Black---14);
+  @extend %medium_L;
+}
+
+.amount_symbol {
+  color: var(--Black-Black---14);
+  @extend %regular_S;
+}

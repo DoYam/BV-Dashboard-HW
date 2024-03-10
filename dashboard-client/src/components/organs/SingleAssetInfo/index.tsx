@@ -1,3 +1,6 @@
+import Amount from '@/components/atoms/dashboard/Amount';
+import Asset from '@/components/atoms/dashboard/Asset';
+
 export interface SingleAssetInfoProps {
   address: string;
   symbol: string;
@@ -9,5 +12,10 @@ export interface SingleAssetInfoProps {
 }
 
 export default function SingleAssetInfo(props: SingleAssetInfoProps) {
-  return <div>{/* 이곳에 코드를 작성해 주세요. */}</div>;
+  return (
+    <div>
+      <Amount symbol={props.symbol} balance={props.balance}></Amount>
+      {/* <Asset address={props.address} symbol={props.symbol} name={props.name}></Asset> */}
+    </div>
+  );
 }
