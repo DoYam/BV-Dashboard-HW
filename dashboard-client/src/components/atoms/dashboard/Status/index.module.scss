@@ -1,0 +1,17 @@
+@import '@/styles/_fonts.scss';
+
+.status_container {
+  width: 50px;
+}
+
+.status_deposit {
+  background-color: #afbaf0;
+  border-radius: 12.5px;
+  @extend %medium_M;
+}
+
+.status_withdraw {
+  background-color: #ffcce5;
+  border-radius: 12.5px;
+  @extend %medium_M;
+}

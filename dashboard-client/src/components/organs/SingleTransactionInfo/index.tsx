@@ -1,3 +1,4 @@
+import Status from '@/components/atoms/dashboard/Status';
 import { TokenTransferStatus } from '@/libs/types';
 
 export interface SingleTransactionInfoProps {
@@ -11,5 +12,9 @@ export interface SingleTransactionInfoProps {
 }
 
 export default function SingleTransactionInfo(props: SingleTransactionInfoProps) {
-  return <div>{/* 이곳에 코드를 작성해 주세요. */}</div>;
+  return (
+    <div>
+      <Status status={props.status}></Status>
+    </div>
+  );
 }
