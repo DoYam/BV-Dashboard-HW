@@ -12,9 +12,5 @@ export interface SingleTransactionInfoProps {
 }
 
 export default function SingleTransactionInfo(props: SingleTransactionInfoProps) {
-  return (
-    <div>
-      <Status status={props.status}></Status>
-    </div>
-  );
+  return <div>{/* <Status status={props.status}></Status> */}</div>;
 }
