@@ -1,7 +1,8 @@
+import s from './index.module.scss';
+import Button from '@/components/atoms/button/Button';
 import Address from '@/components/atoms/dashboard/Address';
 import Amount from '@/components/atoms/dashboard/Amount';
 import Asset from '@/components/atoms/dashboard/Asset';
-import Status from '@/components/atoms/dashboard/Status';
 
 export interface SingleAssetInfoProps {
   address: string;
@@ -15,10 +16,11 @@ export interface SingleAssetInfoProps {
 
 export default function SingleAssetInfo(props: SingleAssetInfoProps) {
   return (
-    <div>
+    <div className={s.singleAssetInfo_container}>
+      <Asset address={props.address} symbol={props.symbol} name={props.name}></Asset>
+      <Amount symbol={props.symbol} balance={props.balance}></Amount>
       {/* <Address address={props.address}></Address> */}
-      {/* <Amount symbol={props.symbol} balance={props.balance}></Amount> */}
-      {/* <Asset address={props.address} symbol={props.symbol} name={props.name}></Asset> */}
+      <Button></Button>
     </div>
   );
 }
