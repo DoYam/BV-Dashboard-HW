@@ -1,0 +1,8 @@
+@import '@/styles/_fonts.scss';
+
+.date_container {
+  width: 70px;
+  text-align: right;
+  color: var(--Black-Black---14);
+  @extend %medium_M;
+}
