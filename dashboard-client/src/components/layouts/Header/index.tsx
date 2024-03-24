@@ -3,13 +3,17 @@ import Tab from '@/components/atoms/navbar/Tab';
 import WalletConnectStatus from '@/components/atoms/navbar/WalletConnectStatus';
 import { StatusToast } from '@/components/popups/Toast/StatusToast';
 import useUpdateUserInfo from '@/hooks/useUpdateUserInfo';
+import { getCookie, setCookie } from '@/libs/cookie';
 import { TabType } from '@/libs/types';
+import { COOKIE_KEY } from '@/libs/types';
+import { validateWalletNetwork } from '@/libs/validator';
+import { getServerSideProps } from '@/pages/index';
 import Error from '@/public/assets/Error.png';
 import Success from '@/public/assets/Success.png';
 import { ToastContext } from '@/store/GlobalContext';
 import { WalletContext } from '@/store/GlobalContext';
 import { useFetchUser } from '@graphql/client';
-import { useCallback, useContext, useState } from 'react';
+import { useCallback, useContext, useEffect, useState } from 'react';
 
 /* 
   [HW 1-3] 지갑 연결 기능 개발하기
@@ -58,6 +62,12 @@ export default function Header() {
     [fetchUser, updateUserInfo]
   );
 
+  useEffect(() => {
+    setCookie(COOKIE_KEY.WALLET_ADDRESS, wallet?.accounts[0].address!, new Date(Date.now() + 1000 * 60 * 60 * 24), {});
+    setCookie(COOKIE_KEY.CHAIN_ID, wallet?.chains[0].id!, new Date(Date.now() + 1000 * 60 * 60 * 24), {});
+    handleFetchUser(wallet?.accounts[0]?.address!);
+  }, [wallet?.accounts[0]?.address, wallet?.chains[0]?.id]);
+
   const handleWalletConnect = useCallback(async () => {
     if (wallet) {
       // 지갑이 연결되어 있을 경우, 연결을 해제합니다.
@@ -68,12 +78,30 @@ export default function Header() {
       try {
         const walletAddress = loadedWallet.accounts[0]?.address; // 지갑 주소 확인
         const chainId = loadedWallet.chains[0]?.id; // 체인 확인
-        if (walletAddress && chainId === '0xaa36a7') {
-          // 유효한 경우에만 fetchUser 호출
-          handleFetchUser(walletAddress);
-        } else {
-          console.log('Invalid wallet address or chain ID');
+
+        if (validateWalletNetwork(walletAddress, chainId)) {
+          // 연결된 지갑 정보가 유효하다면 쿠키 저장
+          setCookie(COOKIE_KEY.WALLET_ADDRESS, walletAddress, new Date(Date.now() + 1000 * 60 * 60 * 24), {});
+          setCookie(COOKIE_KEY.CHAIN_ID, chainId, new Date(Date.now() + 1000 * 60 * 60 * 24), {});
+
+          // const storedWalletAddress = getCookie(COOKIE_KEY.WALLET_ADDRESS, {});
+          // const storedChainId = getCookie(COOKIE_KEY.CHAIN_ID, {});
+
+          // // 쿠키에 저장된 지갑 주소 및 chainId를 확인한 후, 지갑 상태에 저장된 지갑 주소 및 chainId와 다를 시,
+          // // 쿠키 정보를 업데이트하고 사용자의 자산 및 트랜잭션 정보를 최신화해 주세요.
+          // if (storedWalletAddress !== walletAddress || storedChainId !== chainId) {
+          //   setCookie(COOKIE_KEY.WALLET_ADDRESS, walletAddress, new Date(Date.now() + 1000 * 60 * 60 * 24), {});
+          //   setCookie(COOKIE_KEY.CHAIN_ID, chainId, new Date(Date.now() + 1000 * 60 * 60 * 24), {});
+          //   handleFetchUser(walletAddress);
+          // }
         }
+
+        // if (walletAddress && chainId === '0xaa36a7') {
+        //   // 유효한 경우에만 fetchUser 호출
+        //   handleFetchUser(walletAddress);
+        // } else {
+        //   console.log('Invalid wallet address or chain ID');
+        // }
       } catch (error) {
         console.error('Failed to connect wallet:', error);
       } finally {

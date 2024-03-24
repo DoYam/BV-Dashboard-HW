@@ -61,7 +61,7 @@ export const getServerSideProps: GetServerSideProps = async ({ req, res }) => {
 
 export default function Home({ userInfo }: { userInfo: FetchUserRes | null }) {
   const { updateUserInfo } = useUpdateUserInfo();
-
+  // console.log(userInfo);
   useEffect(() => {
     updateUserInfo(userInfo);
   }, [userInfo, updateUserInfo]);
