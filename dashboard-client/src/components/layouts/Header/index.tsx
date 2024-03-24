@@ -7,6 +7,7 @@ import { TabType } from '@/libs/types';
 import Error from '@/public/assets/Error.png';
 import Success from '@/public/assets/Success.png';
 import { ToastContext } from '@/store/GlobalContext';
+import { WalletContext } from '@/store/GlobalContext';
 import { useFetchUser } from '@graphql/client';
 import { useCallback, useContext, useState } from 'react';
 
@@ -17,8 +18,8 @@ import { useCallback, useContext, useState } from 'react';
 
 export default function Header() {
   const [, setToast] = useContext(ToastContext);
-
   const [isFetching, setIsFetching] = useState(false);
+  const { wallet, connect, disconnect } = useContext(WalletContext);
 
   /* 
     아래 함수는 서버로부터 가져온 사용자의 자산 정보를 전역 상태(Global state)에 저장하거나, 초기화하는 함수입니다. 
@@ -31,6 +32,8 @@ export default function Header() {
     fetchUser 함수를 호출하여 사용자의 자산 및 트랜잭션 현황 정보를 업데이트하고 최신 정보를 내려받을 수 있어요. 
     handleFetchUser 함수 내부에서만 호출되는 함수로, 과제 구현 시에는 handleFetchUser 함수를 사용해 주세요.
   */
+  // 연결된 지갑 정보가 유효함은, 지갑 주소가 존재하며 블록체인이 Sepolia 테스트넷임을 의미해요.
+
   const [fetchUser] = useFetchUser({
     onCompleted: () => {
       setToast(<StatusToast icon={Success} content="지갑의 자산 정보를 가져왔어요." />);
@@ -55,6 +58,30 @@ export default function Header() {
     [fetchUser, updateUserInfo]
   );
 
+  const handleWalletConnect = useCallback(async () => {
+    if (wallet) {
+      // 지갑이 연결되어 있을 경우, 연결을 해제합니다.
+      await disconnect({ label: wallet.label });
+    } else {
+      // 지갑이 연결되어 있지 않을 경우, 연결을 시도합니다.
+      const [loadedWallet] = await connect();
+      try {
+        const walletAddress = loadedWallet.accounts[0]?.address; // 지갑 주소 확인
+        const chainId = loadedWallet.chains[0]?.id; // 체인 확인
+        if (walletAddress && chainId === '0xaa36a7') {
+          // 유효한 경우에만 fetchUser 호출
+          handleFetchUser(walletAddress);
+        } else {
+          console.log('Invalid wallet address or chain ID');
+        }
+      } catch (error) {
+        console.error('Failed to connect wallet:', error);
+      } finally {
+        setIsFetching(false);
+      }
+    }
+  }, [wallet, connect, disconnect]);
+
   return (
     <div className={s.header}>
       <div className={s.navbar}>
@@ -64,9 +91,10 @@ export default function Header() {
         </div>
         <WalletConnectStatus
           isFetching={isFetching}
-          walletAddress={'0x4950631e0D68A9E9E53b9466f50dCE161F88e42d'}
-          chainId={'0xaa36a7'} // Sepolia Testnet의 id입니다.
-          onWalletConnect={() => {}}
+          walletAddress={wallet ? wallet.accounts[0].address : ''} // 연결된 지갑의 주소 가져오기
+          chainId={wallet ? wallet.chains[0].id : ''} // 연결된 지갑의 체인 아이디 가져오기
+          // chainId={'0xaa36a7'} // Sepolia Testnet의 id입니다.
+          onWalletConnect={handleWalletConnect}
         />
       </div>
       <div className={s.divider_container}>
